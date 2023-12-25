@@ -66,7 +66,7 @@ def draw_board(board):
             else:
                print(column[row])
 
-def score_board(board):
+def score_board(board, lines):
     wins = []
     score = 0
     for line in range(len(board)):
@@ -92,11 +92,21 @@ def score_board(board):
         wins.append(7)
         score += 5
     elif board[0][2] == board[1][1] and board[1][1] == board[2][0]:
-        wins.append(7)
+        wins.append(8)
         score += 5
 
+    for line in wins:
+        if line > lines:
+            wins.remove(line)
+            if 3 < line > 7:
+                score -= 4
+            if line > 6:
+                score -= 5
+            else:
+                score -= 3
+
     if len(wins) == 0:
-        return 0, 'LOSE', 0
+        return 0, 'LOSE', []
     else:
         return score, 'WIN', wins
         
@@ -118,7 +128,7 @@ def play_game():
                 print('Your max bet exceeds your total balance.')
                 bet = place_bet()
             board = pull_handle(item_set)
-            score, res, winners = score_board(board)
+            score, res, winners = score_board(board, lines)
             draw_board(board)
             if res == 'WIN':
                 balance += (score * bet * len(winners)) - (bet * lines) 
