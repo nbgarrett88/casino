@@ -2,7 +2,7 @@ import random
 
 ROWS = 3
 COLS = 3
-MAX_LINES = 8
+MAX_LINES = ROWS + COLS + 2
 
 item_set =['A','B','C','D']
 
@@ -77,23 +77,26 @@ def score_board(board, lines):
                 count += 1
         if count == len(board[line]):
             wins.append(line+1)
-            score += 3
-    
-    if board[0][0] == board[1][0] and board[1][0] == board[2][0]:
-        wins.append(4)
-        score += 4
-    elif board[0][1] == board[1][1] and board[1][1] == board[2][1]:
-        wins.append(5)
-        score += 4
-    elif board[0][2] == board[1][2] and board[1][2] == board[2][2]:
-        wins.append(6)
-        score += 4
-    elif board[0][0] == board[1][1] and board[1][1] == board[2][2]:
-        wins.append(7)
-        score += 5
+            score += 4
+
+    dict = {}
+    for line in range(len(board)):
+        for ix, char in enumerate(board[line]):
+            if (ix,char) in dict:
+                dict[(ix,char)] += 1
+            else:
+                dict[(ix, char)] = 1
+        for key, val in dict.items():
+            if val == len(board):
+                wins.append(key[0]+len(board)+1)
+                score += 6
+
+    if board[0][0] == board[1][1] and board[1][1] == board[2][2]:
+        wins.append(MAX_LINES - 1)
+        score += 8
     elif board[0][2] == board[1][1] and board[1][1] == board[2][0]:
-        wins.append(8)
-        score += 5
+        wins.append(MAX_LINES)
+        score += 8
 
     for line in wins:
         if line > lines:
@@ -108,7 +111,7 @@ def score_board(board, lines):
     if len(wins) == 0:
         return 0, 'LOSE', []
     else:
-        return score, 'WIN', wins
+        return score, 'WIN', wins 
         
 def leave_game(balance):
     answer = input('Enter to continue... (q to quit)\n')
