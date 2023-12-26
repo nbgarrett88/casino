@@ -4,55 +4,33 @@ ROWS = 3
 COLS = 3
 MAX_LINES = ROWS + COLS + 2
 
-item_set =['A','B','C','D']
+item_set = ['A','B','C','D']
 balance = 0
 
-def get_deposit():
+def ask_question(question_type):
+    dict = {
+        'deposit':['\nHow much money will you deposit?\n','ans > 0','\nAmount must be greater than 0'],
+        'lines':[f'\nHow many lines do you want to play? (1-{MAX_LINES})\n','0 < ans <= MAX_LINES',f'\nNumber must be between 1 and {MAX_LINES}'],
+        'bet': ['\nHow much do you wish to bet per line?\n','ans > 0','\nAmount must be greater than 0']
+    }
+
     while True:
-        amt = input('\nHow much money will you deposit?\n')
-        
-        if amt.isdigit():
-            amt = int(amt)
-            if amt > 0:
+        ans = input(dict[question_type][0])
+
+        if ans.isdigit():
+            ans = int(ans)
+            if eval(dict[question_type][1]):
                 break
             else:
-                print('Amount must be greater than 0')
+                print(dict[question_type][2])
         else:
-            print('Amount must be numeric')
-    return amt
-    
-def get_lines():
-    while True:
-        lines = input(f'\nHow many lines do you want to play? (1-{MAX_LINES})\n')
-        
-        if lines.isdigit():
-            lines = int(lines)
-            if 0 < lines <= MAX_LINES:
-                break
-            else:
-                print(f'Input must be between 1 and {MAX_LINES}')
-        else:
-                print('Input must be numeric')
-    return lines
-    
-def place_bet():
-    while True:
-        bet = input('\nHow much do you wish to bet per line?\n')
-        
-        if bet.isdigit():
-            bet = int(bet)
-            if bet > 0:
-                break
-            else:
-                print('Amount must be greater than 0') 
-        else:
-            print('Amount must be numeric')
-    return bet
+            print('\nInput must be numeric')
+    return ans
 
 def pull_handle(item_set):
     res = []
     for column in range(COLS):
-        line=[]
+        line = []
         for rows in range(ROWS):
             line.append(random.choice(item_set))
         res.append(line)
@@ -115,7 +93,7 @@ def score_board(board, lines):
         return score, 'WIN', wins 
 
 def leave_game():
-    print(f'Thank you for playing! You left with ${balance}\n')
+    print(f'\nThank you for playing! You left with ${balance}\n')
     return 0
     
 def continue_screen():
@@ -133,11 +111,11 @@ def play_game():
         menu_options()        
     
     if balance > 0:
-        lines = get_lines()
-        bet = place_bet()
+        lines = ask_question('lines')
+        bet = ask_question('bet')
         if bet * lines > balance:
-            print('Your max bet exceeds your total balance.')
-            bet = place_bet()
+            print('\nYour max bet exceeds your total balance.')
+            bet = ask_question('bet')
         board = pull_handle(item_set)
         score, res, winners = score_board(board, lines)
         draw_board(board)
@@ -165,7 +143,7 @@ def menu_options():
         case '1':
             play_game()
         case '2':
-            balance = get_deposit()
+            balance = ask_question('deposit')
             menu_options()
         case '3':
             print(f'\nCurrent balance is: ${balance}')
