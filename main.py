@@ -5,10 +5,11 @@ COLS = 3
 MAX_LINES = ROWS + COLS + 2
 
 item_set =['A','B','C','D']
+balance = 0
 
 def get_deposit():
     while True:
-        amt = input('How much money will you deposit?\n')
+        amt = input('\nHow much money will you deposit?\n')
         
         if amt.isdigit():
             amt = int(amt)
@@ -22,7 +23,7 @@ def get_deposit():
     
 def get_lines():
     while True:
-        lines = input(f'How many lines do you want to play? (1-{MAX_LINES})\n')
+        lines = input(f'\nHow many lines do you want to play? (1-{MAX_LINES})\n')
         
         if lines.isdigit():
             lines = int(lines)
@@ -36,7 +37,7 @@ def get_lines():
     
 def place_bet():
     while True:
-        bet = input('How much do you wish to bet per line?\n')
+        bet = input('\nHow much do you wish to bet per line?\n')
         
         if bet.isdigit():
             bet = int(bet)
@@ -112,41 +113,71 @@ def score_board(board, lines):
         return 0, 'LOSE', []
     else:
         return score, 'WIN', wins 
-        
-def leave_game(balance):
-    answer = input('Enter to continue... (q to quit)\n')
-    if answer == 'q':
-        print(f'Thank you for playing! You left with ${balance}\n')
-        return 0
-    else:
-        return balance
-    
-def play_game():
-        balance = get_deposit()
-        
-        while balance > 0:
-            lines = get_lines()
-            bet = place_bet()
-            if bet * lines > balance:
-                print('Your max bet exceeds your total balance.')
-                bet = place_bet()
-            board = pull_handle(item_set)
-            score, res, winners = score_board(board, lines)
-            draw_board(board)
-            if res == 'WIN':
-                balance += (score * bet * len(winners)) - (bet * lines) 
-                score = score * bet * len(winners)
-            else: 
-                balance -= bet * lines
-                score = bet * lines * -1
-            
-            print(f'\nYou {res} ${score}! You hit on these lines: {winners}. New balance is ${balance}\n')
-            balance =  leave_game(balance)
 
+def leave_game():
+    print(f'Thank you for playing! You left with ${balance}\n')
+    return 0
+    
+def continue_screen():
+    answer = input('Enter to continue... (q to quit to menu)\n')
+    if answer == 'q':
+        menu_options()
+    else:
+        play_game()
+
+def play_game():
+    global balance
+
+    if balance <= 0:
+        print('\nYour balance is empty. Deposit cash to play.')
+        menu_options()        
+    
+    if balance > 0:
+        lines = get_lines()
+        bet = place_bet()
+        if bet * lines > balance:
+            print('Your max bet exceeds your total balance.')
+            bet = place_bet()
+        board = pull_handle(item_set)
+        score, res, winners = score_board(board, lines)
+        draw_board(board)
+        if res == 'WIN':
+            balance += (score * bet * len(winners)) - (bet * lines) 
+            score = score * bet * len(winners)
+        else: 
+            balance -= bet * lines
+            score = bet * lines * -1
+        
+        print(f'\nYou {res} ${score}! You hit on these lines: {winners}. New balance is ${balance}\n')
+        continue_screen()
+
+def menu_options():
+    global balance
+
+    print('\n1. Play game')
+    print('2. Deposit cash')
+    print('3. Get current balance')
+    print('4. Quit')
+
+    ans = input()
+
+    match ans:
+        case '1':
+            play_game()
+        case '2':
+            balance = get_deposit()
+            menu_options()
+        case '3':
+            print(f'\nCurrent balance is: ${balance}')
+            menu_options()
+        case '4':
+           balance = leave_game()
+        case _:
+            pass
+        
 def main():
     
-    answer = input('Welcome to the Slot Machine!\nWould you like to play? (y or n)\n')
-    if answer == 'y':
-        play_game()
+    input('\nWelcome to the Slot Machine!')
+    menu_options()
     
 main()
