@@ -4,7 +4,7 @@ ROWS = 3
 COLS = 3
 MAX_LINES = ROWS + COLS + 2
 
-item_set = ['A','B','C','D']
+item_set = ['A','B','C','D','X']
 balance = 0
 
 def ask_question(question_type):
@@ -44,6 +44,7 @@ def draw_board(board):
                 print(column[row],end=' | ')
             else:
                print(column[row])
+    print()
 
 def score_board(board, lines):
     wins = []
@@ -67,13 +68,18 @@ def score_board(board, lines):
                 dict[(ix, char)] = 1
         for key, val in dict.items():
             if val == len(board):
-                wins.append(key[0]+len(board)+1)
-                score += 6
+                if key[1] == 'X' and key[0] == 1:
+                    print("***Jackpot!!!***")
+                    wins.append(key[0]+len(board)+1)
+                    score += 200
+                else:
+                    wins.append(key[0]+len(board)+1)
+                    score += 6
 
     if board[0][0] == board[1][1] and board[1][1] == board[2][2]:
         wins.append(MAX_LINES - 1)
         score += 8
-    elif board[0][2] == board[1][1] and board[1][1] == board[2][0]:
+    if board[0][2] == board[1][1] and board[1][1] == board[2][0]:
         wins.append(MAX_LINES)
         score += 8
 
@@ -81,11 +87,11 @@ def score_board(board, lines):
         if line > lines:
             wins.remove(line)
             if 3 < line > 7:
-                score -= 4
+                score -= 8
             if line > 6:
-                score -= 5
+                score -= 6
             else:
-                score -= 3
+                score -= 4
 
     if len(wins) == 0:
         return 0, 'LOSE', []
@@ -98,7 +104,7 @@ def leave_game():
     
 def continue_screen():
     answer = input('Enter to continue... (q to quit to menu)\n')
-    if answer == 'q':
+    if answer.lower() == 'q':
         menu_options()
     else:
         play_game()
@@ -117,16 +123,17 @@ def play_game():
             print('\nYour max bet exceeds your total balance.')
             bet = ask_question('bet')
         board = pull_handle(item_set)
-        score, res, winners = score_board(board, lines)
         draw_board(board)
+        score, res, winners = score_board(board, lines)
         if res == 'WIN':
             balance += (score * bet * len(winners)) - (bet * lines) 
             score = score * bet * len(winners)
+            print(f'You {res} ${score}! You hit on these lines: {winners}. New balance is ${balance}\n')
         else: 
             balance -= bet * lines
-            score = bet * lines * -1
+            score = bet * lines
+            print(f'You {res} -${score}! New balance is ${balance}\n')
         
-        print(f'\nYou {res} ${score}! You hit on these lines: {winners}. New balance is ${balance}\n')
         continue_screen()
 
 def menu_options():
