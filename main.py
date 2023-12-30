@@ -21,7 +21,7 @@ def menu_options():
         case '1':
             prepare_game()
         case '2':
-            balance = balance + ask_question('deposit')
+            balance += ask_question('deposit')
             menu_options()
         case '3':
             print(f'\nCurrent balance is: ${balance}')
@@ -47,9 +47,7 @@ def play_game(lines, bet):
     if bet * lines > balance:
             print('\nYour max bet exceeds your total balance.')
             prepare_game()
-
-    elif balance >= lines:
-
+    else:
         board = pull_handle(ITEM_SET)
         draw_board(board)
         score, res, winners = score_board(board, lines)
@@ -86,7 +84,7 @@ def ask_question(question_type):
     return ans
 
 def continue_screen(lines, bet):
-    ans = input('Enter to continue... (c: change bet m: menu)\n')
+    ans = input('Enter to continue... (c: change bet m: menu)')
     if ans.lower() == 'c':
         prepare_game()
     elif ans.lower() == 'm':
