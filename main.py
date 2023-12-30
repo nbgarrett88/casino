@@ -27,30 +27,33 @@ def menu_options():
             print(f'\nCurrent balance is: ${balance}')
             menu_options()
         case '4':
-           balance = leave_game()
+            leave_game()
         case _:
             pass
 
 def prepare_game():     
-        
+    
     if balance <= 0:
         print('\nYour balance is empty. Deposit cash to play.')
         menu_options() 
-
-    lines = ask_question('lines')
-    bet = ask_question('bet')
-    play_game(lines, bet)
+    else:
+        lines = ask_question('lines')
+        bet = ask_question('bet')
+        play_game(lines, bet)
 
 def play_game(lines, bet):
     global balance
         
-    if balance > 0:
-        if bet * lines > balance:
+    if bet * lines > balance:
             print('\nYour max bet exceeds your total balance.')
-            bet = ask_question('bet')
+            prepare_game()
+
+    elif balance >= lines:
+
         board = pull_handle(ITEM_SET)
         draw_board(board)
         score, res, winners = score_board(board, lines)
+        
         if res == 'WIN':
             balance += (score * bet * len(winners)) - (bet * lines) 
             score = score * bet * len(winners)
@@ -59,10 +62,8 @@ def play_game(lines, bet):
             balance -= bet * lines
             score = bet * lines
             print(f'You {res} -${score}! New balance is ${balance}\n')
+        
         continue_screen(lines, bet)
-    else:
-        print('\nYour balance is empty. Deposit cash to play.')
-        menu_options() 
 
 def ask_question(question_type):
     dict = {
@@ -95,7 +96,6 @@ def continue_screen(lines, bet):
 
 def leave_game():
     print(f'\nThank you for playing! You left with ${balance}\n')
-    return 0
 
 def pull_handle(item_set):
     board = []
@@ -109,8 +109,8 @@ def pull_handle(item_set):
 def draw_board(board):
     print()
     for row in range(len(board[0])):
-        for i, column in enumerate(board):
-            if i != len(board)-1:
+        for ix, column in enumerate(board):
+            if ix != len(board)-1:
                 print(column[row],end=' | ')
             else:
                print(column[row])
@@ -131,21 +131,21 @@ def score_board(board, lines):
 
     dict = {}
     for line in range(len(board)):
-        for i, char in enumerate(board[line]):
-            if (i,char) in dict:
-                dict[(i,char)] += 1
+        for ix, char in enumerate(board[line]):
+            if (ix,char) in dict:
+                dict[(ix,char)] += 1
             else:
-                dict[(i, char)] = 1
+                dict[(ix, char)] = 1
+        
         for key, val in dict.items():
             if val == len(board):
+                wins.append(key[0]+len(board)+1)
                 if key[1] == 'X' and key[0] == 1:
                     print("***Jackpot!!!***")
-                    wins.append(key[0]+len(board)+1)
                     score += MAX_LINES * 15
                 else:
-                    wins.append(key[0]+len(board)+1)
                     score += MAX_LINES
-
+                
     if board[0][0] == board[1][1] and board[1][1] == board[2][2]:
         wins.append(MAX_LINES - 1)
         score += MAX_LINES + 4
@@ -163,7 +163,7 @@ def score_board(board, lines):
             else:
                 score -= MAX_LINES - 2
 
-    if len(wins) == 0:
+    if not wins:
         return 0, 'LOSE', []
     else:
         return score, 'WIN', wins
