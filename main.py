@@ -19,7 +19,7 @@ def menu_options():
 
     match ans:
         case '1':
-            play_game()
+            prepare_game()
         case '2':
             balance = balance + ask_question('deposit')
             menu_options()
@@ -31,16 +31,20 @@ def menu_options():
         case _:
             pass
 
-def play_game():
-    global balance
-
+def prepare_game():     
+        
     if balance <= 0:
         print('\nYour balance is empty. Deposit cash to play.')
-        menu_options()        
-    
+        menu_options() 
+
+    lines = ask_question('lines')
+    bet = ask_question('bet')
+    play_game(lines, bet)
+
+def play_game(lines, bet):
+    global balance
+        
     if balance > 0:
-        lines = ask_question('lines')
-        bet = ask_question('bet')
         if bet * lines > balance:
             print('\nYour max bet exceeds your total balance.')
             bet = ask_question('bet')
@@ -55,8 +59,12 @@ def play_game():
             balance -= bet * lines
             score = bet * lines
             print(f'You {res} -${score}! New balance is ${balance}\n')
+    else:
+        print('\nYour balance is empty. Deposit cash to play.')
+        menu_options() 
+    
         
-        continue_screen()
+    continue_screen(lines, bet)
 
 def ask_question(question_type):
     dict = {
@@ -78,12 +86,14 @@ def ask_question(question_type):
             print('\nInput must be numeric')
     return ans
 
-def continue_screen():
-    ans = input('Enter to continue... (q to quit to menu)\n')
-    if ans.lower() == 'q':
+def continue_screen(lines, bet):
+    ans = input('Enter to continue... (c: change bet m: menu)\n')
+    if ans.lower() == 'c':
+        prepare_game()
+    elif ans.lower() == 'm':
         menu_options()
     else:
-        play_game()
+        play_game(lines, bet)
 
 def leave_game():
     print(f'\nThank you for playing! You left with ${balance}\n')
