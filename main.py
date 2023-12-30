@@ -21,7 +21,7 @@ def menu_options():
         case '1':
             play_game()
         case '2':
-            balance = ask_question('deposit')
+            balance = balance + ask_question('deposit')
             menu_options()
         case '3':
             print(f'\nCurrent balance is: ${balance}')
@@ -123,11 +123,11 @@ def score_board(board, lines):
 
     dict = {}
     for line in range(len(board)):
-        for ix, char in enumerate(board[line]):
-            if (ix,char) in dict:
-                dict[(ix,char)] += 1
+        for i, char in enumerate(board[line]):
+            if (i,char) in dict:
+                dict[(i,char)] += 1
             else:
-                dict[(ix, char)] = 1
+                dict[(i, char)] = 1
         for key, val in dict.items():
             if val == len(board):
                 if key[1] == 'X' and key[0] == 1:
@@ -140,7 +140,7 @@ def score_board(board, lines):
 
     if board[0][0] == board[1][1] and board[1][1] == board[2][2]:
         wins.append(MAX_LINES - 1)
-        score += 12
+        score += MAX_LINES + 4
     if board[0][2] == board[1][1] and board[1][1] == board[2][0]:
         wins.append(MAX_LINES)
         score += MAX_LINES + 4
