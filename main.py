@@ -59,12 +59,10 @@ def play_game(lines, bet):
             balance -= bet * lines
             score = bet * lines
             print(f'You {res} -${score}! New balance is ${balance}\n')
+        continue_screen(lines, bet)
     else:
         print('\nYour balance is empty. Deposit cash to play.')
         menu_options() 
-    
-        
-    continue_screen(lines, bet)
 
 def ask_question(question_type):
     dict = {
