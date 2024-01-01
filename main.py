@@ -1,3 +1,4 @@
+import numpy as np
 import random
 
 ROWS = 3
@@ -60,7 +61,7 @@ def play_game(lines, bet):
             balance -= bet * lines
             score = bet * lines
             print(f'You {res} -${score}! New balance is ${balance}\n')
-        
+
         continue_screen(lines, bet)
 
 def ask_question(question_type):
@@ -84,7 +85,7 @@ def ask_question(question_type):
     return ans
 
 def continue_screen(lines, bet):
-    ans = input('Enter to continue... (c: change bet m: menu)')
+    ans = input('Enter to continue... (c: change bet m: menu)\n')
     if ans.lower() == 'c':
         prepare_game()
     elif ans.lower() == 'm':
@@ -138,25 +139,31 @@ def score_board(board, lines):
         for key, val in dict.items():
             if val == len(board):
                 wins.append(key[0]+len(board)+1)
-                if key[1] == 'X' and key[0] == 1:
+                if key[1] == 'X' and key[0] == COLS//2 and wins[-1] <= lines:
                     print("***Jackpot!!!***")
                     score += MAX_LINES * 15
                 else:
                     score += MAX_LINES
-                
-    if board[0][0] == board[1][1] and board[1][1] == board[2][2]:
-        wins.append(MAX_LINES - 1)
-        score += MAX_LINES + 4
-    if board[0][2] == board[1][1] and board[1][1] == board[2][0]:
-        wins.append(MAX_LINES)
-        score += MAX_LINES + 4
 
-    for line in wins:
+    board = np.array(board)
+
+    diags = [board[::-1,:].diagonal(i) for i in range(-board.shape[0]+1,board.shape[1]) if len(board[::-1,:].diagonal(i)) == COLS]
+    diags.extend(board.diagonal(i) for i in range(board.shape[1]-1,-board.shape[0],-1) if len(board.diagonal(i)) == COLS)
+
+    for ix, line in enumerate(diags):
+        if all(x == line[0] for x in line):
+            if ix == 1:
+                 wins.append(MAX_LINES)
+            else:
+                 wins.append(MAX_LINES-1)
+            score += MAX_LINES + 4
+
+    for line in list(wins):
         if line > lines:
             wins.remove(line)
-            if 3 < line > 7:
+            if ROWS < line > ROWS + COLS:
                 score -= MAX_LINES + 4
-            if line > 6:
+            elif line > ROWS + COLS:
                 score -= MAX_LINES
             else:
                 score -= MAX_LINES - 2
@@ -168,7 +175,8 @@ def score_board(board, lines):
         
 def main():
     
-    input('\nWelcome to the Slot Machine!')
+    input('\nWelcome to the Slot Machine!\n')
     menu_options()
     
-main()
+if __name__ == "__main__":
+    main()
