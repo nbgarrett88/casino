@@ -118,14 +118,9 @@ def draw_board(board):
 def score_board(board, lines):
     wins = []
     score = 0
-    for line in range(len(board)):
-        count = 0
-        for char in board[line]:
-            found_char = board[line][0]
-            if char == found_char:
-                count += 1
-        if count == len(board[line]):
-            wins.append(line+1)
+    for line in board:
+        if all(x == line[0] for x in line):
+            wins.append(board.index(line)+1)
             score += MAX_LINES - 2
 
     dict = {}
@@ -147,8 +142,14 @@ def score_board(board, lines):
 
     board = np.array(board)
 
-    diags = [board[::-1,:].diagonal(i) for i in range(-board.shape[0]+1,board.shape[1]) if len(board[::-1,:].diagonal(i)) == COLS]
-    diags.extend(board.diagonal(i) for i in range(board.shape[1]-1,-board.shape[0],-1) if len(board.diagonal(i)) == COLS)
+    diags = [
+        board[::-1,:].diagonal(i) for i in range(-board.shape[0]+1,board.shape[1]) 
+            if len(board[::-1,:].diagonal(i)) == COLS
+        ]
+    diags.extend(
+        board.diagonal(i) for i in range(board.shape[1]-1,-board.shape[0],-1) 
+            if len(board.diagonal(i)) == COLS
+        )
 
     for ix, line in enumerate(diags):
         if all(x == line[0] for x in line):
