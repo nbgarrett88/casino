@@ -116,29 +116,28 @@ def draw_board(board):
     print()
 
 def score_board(board, lines):
+    dict = {}
     wins = []
     score = 0
-    for line in board:
-        if all(x == line[0] for x in line):
-            wins.append(board.index(line)+1)
+    for line in range(len(board)):
+        if all(x == board[line][0] for x in board[line]):
+            wins.append(line+1)
             score += MAX_LINES - 2
 
-    dict = {}
-    for line in range(len(board)):
         for ix, char in enumerate(board[line]):
             if (ix,char) in dict:
                 dict[(ix,char)] += 1
             else:
                 dict[(ix, char)] = 1
         
-        for key, val in dict.items():
-            if val == len(board):
-                wins.append(key[0]+len(board)+1)
-                if key[1] == 'X' and key[0] == COLS//2 and wins[-1] <= lines:
-                    print("***Jackpot!!!***")
-                    score += MAX_LINES * 15
-                else:
-                    score += MAX_LINES
+    for key, val in dict.items():
+        if val == len(board):
+            wins.append(key[0]+len(board)+1)
+            if key[1] == 'X' and key[0] == COLS//2 and wins[-1] <= lines:
+                print("***Jackpot!!!***")
+                score += MAX_LINES * 25
+            else:
+                score += MAX_LINES
 
     board = np.array(board)
 
